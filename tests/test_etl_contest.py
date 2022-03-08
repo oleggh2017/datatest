@@ -50,5 +50,4 @@ def test_data_transfer(mysql_source_image,
                        mysql_destination_image):
     transfer_service = TransferService()
     transfer_service.transfer()
-    time.sleep(1111)
 
