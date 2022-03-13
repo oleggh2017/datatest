@@ -19,7 +19,7 @@ class Connection:
             result = cursor.fetchall()
         return result
 
-    def insert(self, query):
+    def execute(self, query):
         with self._con.cursor() as cursor:
             cursor.execute(query)
         self._con.commit()

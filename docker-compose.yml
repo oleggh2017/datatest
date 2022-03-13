@@ -1,0 +1,26 @@
+version: '3.7'
+
+services:
+  source_db:
+    image: "percona/percona-server:5.7.32"
+    container_name: source_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: sandbox
+      MYSQL_USER: etl
+      MYSQL_PASSWORD: etl_contest
+      MYSQL_ROOT_PASSWORD: root_etl_contest
+    ports:
+      - "4443:3306"
+
+  destination_db:
+    image: "percona/percona-server:5.7.32"
+    container_name: destination_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: sandbox
+      MYSQL_USER: etl
+      MYSQL_PASSWORD: etl_contest
+      MYSQL_ROOT_PASSWORD: root_etl_contest
+    ports:
+      - "4444:3306"

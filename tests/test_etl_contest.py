@@ -1,6 +1,9 @@
-import time
 
 import pymysql
+from tests.helpers import (
+    get_dst_hash,
+    get_src_hash,
+)
 
 from transfer_service import TransferService
 from .helpers import ping_container
@@ -46,8 +49,11 @@ def test_containers_assets_is_ready(mysql_source_image,
     assert dst_result['total'] == 0
 
 
-def test_data_transfer(mysql_source_image,
-                       mysql_destination_image):
+def test_data_transfer(mysql_src_connection, mysql_dst_connection):
     transfer_service = TransferService()
-    transfer_service.transfer()
-
+    for _ in range(15):
+        transfer_service.transfer()
+    src_hash = get_src_hash(mysql_src_connection)
+    dst_hash = get_dst_hash(src_hash, mysql_dst_connection)
+    assert dst_hash
+    assert dst_hash['MD5'] == src_hash['MD5']

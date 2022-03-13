@@ -11,6 +11,8 @@ class Settings(BaseSettings):
 
     source_port: int = 4441
     destination_port: int = 4442
+    # main_sleep_time: int = 60 * 60 * 2
+    main_sleep_time: int = 1
 
 
 settings = Settings()

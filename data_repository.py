@@ -1,5 +1,6 @@
 import datetime
-from typing import Dict, List
+
+import pytz
 from connection import Connection
 
 
@@ -27,17 +28,20 @@ class DestinationDataRepository:
 
     def get_last_datetime_transaction(self):
         """Метод позволяет узнать последней дате для 'Дозагрузка данных с момента последней даты в сервере назначения'. """
-        return self._connection.select('SELECT dt FROM transactions_denormalized ORDER BY id DESC  limit 1')
+        result = self._connection.select('SELECT dt FROM transactions_denormalized ORDER BY id DESC  limit 1')
+        if result:
+            return result[0][0]
+        return result
 
     def insert_data(self, rows):
+        timezone = pytz.timezone('UTC')
         if len(rows) == 0:
             return
         values = []
         for row in rows:
             values.append(f"""
-            ({row[0]}, FROM_UNIXTIME({datetime.datetime.timestamp(row[1])}), {row[2]}, {row[3]}, {row[4]}, '{row[5]}')
+            ({row[0]}, FROM_UNIXTIME({datetime.datetime.timestamp(timezone.localize(row[1]))}), {row[2]}, {row[3]}, {row[4]}, '{row[5]}')
             """)
         values_str = ', '.join(values)
         query = f'INSERT INTO transactions_denormalized ( id, dt, move,  amount, idoper, name_oper ) VALUES {values_str}'
-        print(query)
-        self._connection.insert(query)
+        self._connection.execute(query)

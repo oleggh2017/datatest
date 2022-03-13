@@ -1,6 +1,7 @@
 import time
 import pytest   # noqa
 import docker   # noqa
+import pymysql
 from .helpers import (get_session_id,
                       ping_container,
                       load_assets_to_source_db,
@@ -12,6 +13,7 @@ from settings import settings
 BASE_DOCKER_IMAGE = 'percona/percona-server:5.7.32'
 TIME_SLEEP = 1
 
+
 class Container(object):
     def __init__(self, db_port: int, container_name: str):
         self.container = None
@@ -20,17 +22,19 @@ class Container(object):
         self.db_port = db_port
         self.container_name = container_name
 
-        self.credentials = {'host': 'localhost',
+        self.credentials = {'host': settings.host,
                             'port': self.db_port,
-                            'database': 'sandbox',
-                            'user': 'etl',
-                            'password': 'etl_contest',
+                            'database': settings.database,
+                            'user': settings.db_user,
+                            'password': settings.password,
                             'autocommit': True}
 
         self.env = {'MYSQL_DATABASE': 'sandbox',
                     'MYSQL_USER': 'etl',
                     'MYSQL_PASSWORD': 'etl_contest',
-                    'MYSQL_ROOT_PASSWORD': 'root_etl_contest'}
+                    'MYSQL_ROOT_PASSWORD': 'root_etl_contest',
+                    'TZ': 'UTC',
+        }
 
         self.ports = {3306: self.db_port}
 
@@ -87,3 +91,19 @@ def mysql_destination_image():
     with Container(db_port=settings.destination_port, container_name='destination') as c:
         load_struct_to_destination_db(c.credentials)
         yield c.credentials
+
+
+@pytest.fixture(scope='function')
+def mysql_src_connection(mysql_source_image):
+    src_conn = pymysql.connect(**mysql_source_image,
+                               cursorclass=pymysql.cursors.DictCursor)
+    yield src_conn
+    src_conn.close()
+
+
+@pytest.fixture(scope='function')
+def mysql_dst_connection(mysql_destination_image):
+    dst_conn = pymysql.connect(**mysql_destination_image,
+                               cursorclass=pymysql.cursors.DictCursor)
+    yield dst_conn
+    dst_conn.close()
