@@ -1,7 +1,5 @@
-import time
-
 import datetime
-from connection import Connection
+from etl.connection import Connection
 from settings import settings
 from data_repository import SourceDataRepository, DestinationDataRepository
 from logger import logger

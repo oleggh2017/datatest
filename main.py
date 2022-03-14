@@ -1,5 +1,5 @@
 import time
-from transfer_service import TransferService
+from etl.transfer_service import TransferService
 from settings import settings
 
 

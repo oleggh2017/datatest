@@ -5,7 +5,7 @@ from tests.helpers import (
     get_src_hash,
 )
 
-from transfer_service import TransferService
+from etl.transfer_service import TransferService
 from .helpers import ping_container
 
 

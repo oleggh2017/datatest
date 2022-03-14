@@ -1,7 +1,7 @@
 import datetime
 
 import pytz
-from connection import Connection
+from etl.connection import Connection
 
 
 class SourceDataRepository:
